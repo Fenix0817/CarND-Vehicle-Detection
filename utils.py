@@ -40,9 +40,47 @@ def to_lab(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
 
 
+def change_color_space(img, cspace="YCrCb"):
+    """
+    Takes in a RGB image and returns a new image in the target color space.
+    If the current image and target image are both rgb, then a copy of the image is returned
+    """
+    feature_image = None
+    if cspace != 'RGB':
+        if cspace == 'HSV':
+            feature_image = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+        elif cspace == 'LUV':
+            feature_image = cv2.cvtColor(img, cv2.COLOR_RGB2LUV)
+        elif cspace == 'HLS':
+            feature_image = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
+        elif cspace == 'YUV':
+            feature_image = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
+        elif cspace == "YCrCb":
+            feature_image = cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
+        elif cspace == "LAB":
+            feature_image = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
+    else:
+        feature_image = np.copy(img)
+
+    return feature_image
+
+
+def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6, alternating_bbox_color=(0, 255, 0), copy=True):
+    """
+    Returns a new image the bounding boxes have been overlaid in the chosen color
+    """
+    imcopy = np.copy(img) if copy else img
+    for i, bbox in enumerate(bboxes):
+        c = color if i % 2 == 0 else alternating_bbox_color
+        cv2.rectangle(imcopy, bbox[0], bbox[1], c, thick)
+
+    return imcopy
+
 ##############################################################################
 #################    IMAGE LOADING AND RENDERING FUNCTIONS   #################
 ##############################################################################
+
+
 def load_image(path, to_rgb=True):
     """
     Load image from the given path. By default the returned image is in RGB.
@@ -82,3 +120,24 @@ def show_image_list(img_list, img_labels, title, cols=2, fig_size=(15, 15), show
     plt.show()
 
     return
+
+
+##############################################################################
+#################          MISCELLANEOUS FUNCTIONS           #################
+##############################################################################
+
+import pickle
+
+
+def save_as_pickle(data, pickle_file_name):
+    """
+    Saves the data inside a pickle file
+    """
+    pickle.dump(data, open(pickle_file_name, "wb"))
+
+
+def load_as_pickle(pickle_file_name):
+    """
+    Returns the loaded data inside the specified pickle file
+    """
+    return pickle.load(open(pickle_file_name, "rb"))
