@@ -84,7 +84,40 @@ We did not have enough time to experiment with many classifiers so opted to use 
 
 The ideal parameters for _C_ and _gamma_ were obtained by using the [GridSearchCV](http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV) function.
 
-On the test set, our accuracy is at around 97%.
+The code below shows the function used for grid search.
+
+```
+def train_classifier_grid_search(data, labels, method="SVM"):
+    parameters = {}
+    cfier = None
+    if method == "SVM":    
+        parameters = {'kernel':('linear', 'rbf'), 'C':[1, 1000], "gamma":["auto", 0.1, 10]}
+        cfier = SVC()
+
+    cfier_gs = GridSearchCV(cfier, parameters, n_jobs=2, verbose=5)
+    cfier_gs.fit(data, labels)
+```
+
+As we were lacking time to perform a grid search, we opted for a SVC classifier with _C_=1000:
+
+```
+def train_classifier(data, labels, method="SVM"):
+    """
+    Train a classifier on the data and labels and returns the trained classifier
+    The classifier itself can be chosen from a variety of options. The default is SVM    
+    """
+    cfier = None
+    if method == "SVM":
+        cfier = SVC(C=1000)
+    elif method == "DecisionTree":
+        cfier = DecisionTreeClassifier()        
+    
+    cfier.fit(data, labels)
+
+    return cfier    
+```
+
+On the test set, our classifier achieves accuracy of around 97%.
 
 # Sliding Windows
 
